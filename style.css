@@ -1,0 +1,319 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #12131a;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 40px 20px;
+}
+
+/* Переключатель экранов */
+.hidden {
+    display: none !important;
+}
+
+.menu-container, .casino-container {
+    text-align: center;
+    width: 100%;
+    max-width: 950px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: 2.8rem;
+    color: #ffb703;
+    text-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    color: #6a6d85;
+    margin-bottom: 40px;
+    font-size: 1rem;
+}
+
+.section-title {
+    text-align: left;
+    font-size: 0.9rem;
+    color: #ff4d4d;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2b2d3c;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+/* Сетка кейсов как на скриншоте */
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* Карточка кейса */
+.case-card {
+    background: #1c1d27;
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.case-card:hover {
+    transform: translateY(-50px);
+    border-color: #ffb703;
+    box-shadow: 0 10px 25px rgba(255, 183, 3, 0.15);
+}
+
+.case-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4d4d;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Плейсхолдер для твоей будущей картинки кейса */
+.case-image-placeholder {
+    width: 140px;
+    height: 110px;
+    background: radial-gradient(circle, #2a2c3d 0%, #1c1d27 100%);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.cube-art {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 10px rgba(255,183,3,0.5));
+}
+
+.case-info {
+    text-align: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.case-name {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.case-count {
+    font-size: 0.75rem;
+    color: #6a6d85;
+}
+
+.case-price {
+    width: 100%;
+    background: #242634;
+    border: 1px solid #33364d;
+    color: #ffb703;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 6px 0;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Заблокированные кейсы */
+.case-card.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.case-card.locked:hover {
+    transform: none;
+    border-color: #2b2d3c;
+    box-shadow: none;
+}
+.case-card.locked .case-price {
+    color: #6a6d85;
+}
+
+/* Кнопка "Назад" */
+.back-btn {
+    background: #1c1d27;
+    border: 1px solid #2b2d3c;
+    color: #6a6d85;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    float: left;
+    transition: 0.2s;
+}
+.back-btn:hover {
+    color: #fff;
+    border-color: #ff4d4d;
+}
+
+/* --- РУЛЕТКА CS:GO --- */
+.roulette-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px; 
+    height: 160px;
+    background: #1c1d27;
+    border: 3px solid #2b2d3c;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    margin: 40px auto 30px auto;
+    clear: both;
+}
+
+.pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background: #ff4d4d;
+    z-index: 10;
+    box-shadow: 0 0 10px #ff4d4d;
+}
+.pointer::before, .pointer::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    border: 8px solid transparent;
+}
+.pointer::before { top: 0; border-top-color: #ff4d4d; }
+.pointer::after { bottom: 0; border-bottom-color: #ff4d4d; }
+
+.roulette-tape {
+    display: flex;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    height: 140px;
+    transition: transform 5.5s cubic-bezier(0.25, 0.1, 0.1, 1); 
+    will-change: transform;
+}
+
+.card {
+    flex-shrink: 0;
+    width: 270px; 
+    height: 140px;
+    margin: 0 5px;
+    background: #242634;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 15px;
+    text-align: center;
+    border-bottom: 5px solid #fff;
+    cursor: default;
+}
+
+.card .type-name {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #6a6d85;
+}
+
+.card .math-preview {
+    font-size: 1.2rem; 
+    font-weight: bold;
+    color: #fff;
+}
+
+.card.blue { border-bottom-color: #4b69ff; background: linear-gradient(to top, #1a2247, #242634); }
+.card.purple { border-bottom-color: #8847ff; background: linear-gradient(to top, #2d1a47, #242634); }
+.card.pink { border-bottom-color: #d32ce6; background: linear-gradient(to top, #441647, #242634); }
+.card.red { border-bottom-color: #eb4b4b; background: linear-gradient(to top, #4e1a1a, #242634); }
+
+.spin-btn {
+    background: linear-gradient(135deg, #ffb703, #fb8500);
+    border: none;
+    color: #fff;
+    padding: 15px 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(251, 133, 0, 0.3);
+    transition: 0.2s;
+}
+.spin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(251, 133, 0, 0.5);
+}
+.spin-btn:disabled {
+    background: #444;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Модалка */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #1c1d27;
+    border: 2px solid #ffb703;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255, 183, 3, 0.3);
+}
+.close-btn {
+    position: absolute;
+    right: 20px; top: 15px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #aaa;
+}
+.close-btn:hover { color: #fff; }
+.modal-task {
+    background: #242634;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 20px 0;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    border-left: 5px solid #ffb703;
+}
+.modal-warning { color: #ff4d4d; font-weight: bold; }

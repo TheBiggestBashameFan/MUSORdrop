@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лас-Вейерштрасс | Проф Матан Кейсы</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Подключаем быстрые формулы -->
+    <script src="https://cloudflare.com" async></script>
+</head>
+<body>
+
+    <!-- ГЛАВНОЕ МЕНЮ С КЕЙСАМИ -->
+    <div class="menu-container" id="mainMenu">
+        <h1>🎰 ЛАС-ВЕЙЕРШТРАСС 🎰</h1>
+        <p class="subtitle">Выбери кейс, чтобы испытать удачу перед ЕГЭ</p>
+        
+        <h3 class="section-title">СЕРИЙНЫЕ КЕЙСЫ</h3>
+        
+        <div class="cases-grid">
+            <!-- Твой первый рабочий кейс -->
+            <div class="case-card" id="startCaseBtn">
+                <div class="case-badge">NEW</div>
+                <!-- Заглушка для твоей будущей картинки -->
+                <div class="case-image-placeholder">
+                    <div class="cube-art">📐</div>
+                </div>
+                <div class="case-info">
+                    <span class="case-name">VALKYRA (ПРОФИЛЬ)</span>
+                    <span class="case-count">6 предметов</span>
+                </div>
+                <div class="case-price">0 Р</div>
+            </div>
+
+            <!-- Заглушки для красоты (как на твоем скрине), пока закрытые -->
+            <div class="case-card locked">
+                <div class="case-image-placeholder">🔒</div>
+                <div class="case-info">
+                    <span class="case-name">MANTICORE (ВЫШМАТ)</span>
+                    <span class="case-count">Скоро</span>
+                </div>
+                <div class="case-price">149 Р</div>
+            </div>
+            
+            <div class="case-card locked">
+                <div class="case-image-placeholder">🔒</div>
+                <div class="case-info">
+                    <span class="case-name">ЭЙНШТЕЙН (ФИЗИКА)</span>
+                    <span class="case-count">Скоро</span>
+                </div>
+                <div class="case-price">299 Р</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН РУЛЕТКИ (Изначально скрыт через CSS) -->
+    <div class="casino-container hidden" id="rouletteScreen">
+        <button class="back-btn" id="backToMenuBtn">⬅ В МЕНЮ</button>
+        
+        <h1 style="font-size: 2.2rem; margin-top: 10px;">КЕЙС: VALKYRA</h1>
+        <p class="subtitle">Стрелка покажет твою судьбу на экзамене</p>
+
+        <!-- Рулетка в стиле CS:GO -->
+        <div class="roulette-wrapper">
+            <div class="pointer"></div>
+            <div class="roulette-tape" id="tape">
+                <!-- Карточки создаются через JS -->
+            </div>
+        </div>
+
+        <button class="spin-btn" id="spinBtn">ОТКРЫТЬ КЕЙС</button>
+    </div>
+
+    <!-- Модалка выигрыша -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2 id="modalTitle">Выпало задание!</h2>
+            <div class="modal-task" id="modalTask"></div>
+            <p class="modal-warning">Срок сдачи: вчера. Иди ботай!</p>
+        </div>
+    </div>
+
+    <!-- ТВОИ ЗВУКИ ИЗ ПАПКИ -->
+    <audio id="localTickSound" src="tick.mp3" preload="auto"></audio>
+    <audio id="localWinSound" src="win.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

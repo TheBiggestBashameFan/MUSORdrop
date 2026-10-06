@@ -64,6 +64,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const TOTAL_CARDS = 60;  
     let generatedCards = [];
 
+    document.querySelectorAll('.case-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const caseType = card.getAttribute('data-case-type');
+            
+            // ПРОВЕРКА: Если JSON еще не успел скачаться с сервера, берем паузу
+            if (!casesData || !casesData[caseType] || casesData[caseType].length === 0) {
+                alert("Секунду, база данных задач еще подгружается сервером! Нажми через мгновение.");
+                return;
+            }
+
+            activeCasePool = casesData[caseType];
+            
+            const caseNames = { firstPart: "ПЕРВАЯ ЧАСТЬ", geometry: "ГЕОМЕТРИЯ", secondPart: "ВТОРАЯ ЧАСТЬ" };
+            currentCaseTitle.innerText = `КЕЙС: ${caseNames[caseType]}`;
+
+            mainMenu.classList.add('hidden');
+            rouletteScreen.classList.remove('hidden');
+            
+            // ПРИНУДИТЕЛЬНЫЙ СБРОС И ГЕНЕРАЦИЯ ЛЕНТЫ
+            isUpgradeGame = false;
+            tape.style.transition = 'none';
+            tape.style.transform = 'translateX(0px)';
+            spinBtn.disabled = false;
+            
+            createTape(); // Теперь лента гарантированно создастся из заполненного массива!
+        });
+    });
+
+    // Кнопка Назад из рулетки (Она у тебя уже была ниже)
+    if (backToMenuBtn) {
+        backToMenuBtn.addEventListener('click', () => {
+            rouletteScreen.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+            tape.style.transition = 'none';
+            tape.style.transform = 'translateX(0px)';
+            spinBtn.disabled = false;
+        });
+    }
+
     // Переключение экранов в шапке
     if(navMenuBtn && navUpgradeBtn) {
         navMenuBtn.addEventListener('click', () => {

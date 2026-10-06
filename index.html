@@ -3,85 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лас-Вейерштрасс | Проф Матан Кейсы</title>
+    <title>МУСОРдроп</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Подключаем быстрые формулы -->
-    <script src="https://cloudflare.com" async></script>
 </head>
 <body>
 
-    <!-- ГЛАВНОЕ МЕНЮ С КЕЙСАМИ -->
-    <div class="menu-container" id="mainMenu">
-        <h1>🎰 ЛАС-ВЕЙЕРШТРАСС 🎰</h1>
-        <p class="subtitle">Выбери кейс, чтобы испытать удачу перед ЕГЭ</p>
-        
-        <h3 class="section-title">СЕРИЙНЫЕ КЕЙСЫ</h3>
-        
-        <div class="cases-grid">
-            <!-- Твой первый рабочий кейс -->
-            <div class="case-card" id="startCaseBtn">
-                <div class="case-badge">NEW</div>
-                <!-- Заглушка для твоей будущей картинки -->
-                <div class="case-image-placeholder">
-                    <div class="cube-art">📐</div>
-                </div>
-                <div class="case-info">
-                    <span class="case-name">VALKYRA (ПРОФИЛЬ)</span>
-                    <span class="case-count">6 предметов</span>
-                </div>
-                <div class="case-price">0 Р</div>
-            </div>
-
-            <!-- Заглушки для красоты (как на твоем скрине), пока закрытые -->
-            <div class="case-card locked">
-                <div class="case-image-placeholder">🔒</div>
-                <div class="case-info">
-                    <span class="case-name">MANTICORE (ВЫШМАТ)</span>
-                    <span class="case-count">Скоро</span>
-                </div>
-                <div class="case-price">149 Р</div>
-            </div>
-            
-            <div class="case-card locked">
-                <div class="case-image-placeholder">🔒</div>
-                <div class="case-info">
-                    <span class="case-name">ЭЙНШТЕЙН (ФИЗИКА)</span>
-                    <span class="case-count">Скоро</span>
-                </div>
-                <div class="case-price">299 Р</div>
-            </div>
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <div class="top-nav">
+        <div class="nav-logo">🎰 МУСОРдроп</div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" id="navMenuBtn">КЕЙСЫ</button>
+            <button class="nav-btn" id="navUpgradeBtn">🔺 АПГРЕЙДЕР</button>
         </div>
     </div>
 
-    <!-- ЭКРАН РУЛЕТКИ (Изначально скрыт через CSS) -->
-    <div class="casino-container hidden" id="rouletteScreen">
-        <button class="back-btn" id="backToMenuBtn">⬅ В МЕНЮ</button>
-        
-        <h1 style="font-size: 2.2rem; margin-top: 10px;">КЕЙС: VALKYRA</h1>
-        <p class="subtitle">Стрелка покажет твою судьбу на экзамене</p>
+    <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ И ИНВЕНТАРЬ -->
+    <div class="menu-container" id="mainMenu">
+        <h3 class="section-title">Судьба благоволит смелым</h3>
+        <div class="cases-grid">
+            <div class="case-card" data-case-type="firstPart">
+                <div class="case-badge" style="background: #4b69ff;">ЧАСТЬ 1</div>
+                <div class="case-image-placeholder"><div class="cube-art">📝</div></div>
+                <div class="case-info"><span class="case-name">ПЕРВАЯ ЧАСТЬ</span><span class="case-count">Задания №1-13</span></div>
+                <div class="case-price">изи</div>
+            </div>
+            <div class="case-card" data-case-type="geometry">
+                <div class="case-badge" style="background: #d32ce6;">ГЕОМА</div>
+                <div class="case-image-placeholder"><div class="cube-art">📐</div></div>
+                <div class="case-info"><span class="case-name">ГЕОМЕТРИЯ</span><span class="case-count">Вся геома КИМа</span></div>
+                <div class="case-price">ни бе ни ме</div>
+            </div>
+            <div class="case-card" data-case-type="secondPart">
+                <div class="case-badge" style="background: #eb4b4b;">ХАРДКОР</div>
+                <div class="case-image-placeholder"><div class="cube-art">🔥</div></div>
+                <div class="case-info"><span class="case-name">ВТОРАЯ ЧАСТЬ</span><span class="case-count">Задания №14-20</span></div>
+                <div class="case-price">💀💀💀</div>
+            </div>
+        </div>
 
-        <!-- Рулетка в стиле CS:GO -->
+        <h3 class="section-title" style="margin-top: 50px;">ТВОЙ ИНВЕНТАРЬ РЕШЕННЫХ ЗАДАЧ</h3>
+        <div class="inventory-grid" id="inventoryGrid">
+            <p class="empty-inventory-text" id="emptyText">Здесь пока пусто... Реши задачу из кейса, чтобы забрать её себе!</p>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: РУЛЕТКА КЕЙСОВ -->
+    <div class="casino-container hidden" id="rouletteScreen">
+        <button class="back-btn" id="backToMenuBtn">⬅ НАЗАД</button>
+        <h1 style="font-size: 2.2rem; margin-top: 10px;" id="currentCaseTitle">КЕЙС: ???</h1>
         <div class="roulette-wrapper">
             <div class="pointer"></div>
-            <div class="roulette-tape" id="tape">
-                <!-- Карточки создаются через JS -->
-            </div>
+            <div class="roulette-tape" id="tape"></div>
         </div>
-
-        <button class="spin-btn" id="spinBtn">ОТКРЫТЬ КЕЙС</button>
+        <button class="spin-btn" id="spinBtn">МНЕ ПОВЕЗЁТ!</button>
     </div>
 
-    <!-- Модалка выигрыша -->
+    <!-- ЭКРАН 3: ТВОЙ НОВЫЙ АПГРЕЙДЕР -->
+    <div class="upgrader-container hidden" id="upgraderScreen">
+        <div class="upgrader-layout">
+            
+            <!-- Левая часть: Выбор предмета ИЗ инвентаря -->
+            <div class="upgrader-panel">
+                <h3>1. Выбери свою задачу</h3>
+                <div class="upgrader-inventory" id="upgraderInventoryList">
+                    <p class="empty-text">Инвентарь пуст</p>
+                </div>
+            </div>
+
+            <!-- Центральная часть: Колесо шанса и кнопка -->
+            <div class="upgrader-center">
+                <div class="chance-circle-wrapper" id="circleWrapper">
+                    <!-- SVG круг для отрисовки цветного сектора шанса -->
+                    <svg class="svg-ring" width="180" height="180">
+                        <circle class="ring-bg" cx="90" cy="90" r="82"></circle>
+                        <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="82"></circle>
+                    </svg>
+                    <!-- Бегающая стрелочка на контуре -->
+                    <div class="radial-pointer" id="radialPointer"></div>
+                    
+                    <div class="circle-content">
+                        <div class="chance-display" id="chancePercentDisplay">0%</div>
+                        <div class="chance-text">Шанс успеха</div>
+                    </div>
+                </div>
+                <button class="upgrade-action-btn" id="upgradeActionBtn" disabled>🔺 ПРОКАЧАТЬ</button>
+                <div id="upgradeStatusText" style="margin-top: 15px; font-weight: bold; min-height: 20px;"></div>
+            </div>
+
+            <!-- Правая часть: Выбор цели для апгрейда -->
+            <div class="upgrader-panel">
+                <h3>2. До чего прокачать?</h3>
+                <div class="upgrader-targets" id="upgraderTargetsList">
+                    <!-- Загрузится через JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Модалка выигрыша / проверки ответа -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeBtn">&times;</span>
             <h2 id="modalTitle">Выпало задание!</h2>
             <div class="modal-task" id="modalTask"></div>
-            <p class="modal-warning">Срок сдачи: вчера. Иди ботай!</p>
+            <div class="answer-section" id="answerSection">
+                <input type="text" id="userAnswerInput" placeholder="Введите ваш ответ (число)..." autocomplete="off">
+                <button id="submitAnswerBtn">ПРОВЕРИТЬ ОТВЕТ</button>
+            </div>
+            <div id="answerResultStatus" style="font-weight: bold; margin-top: 15px; font-size: 1.1rem;"></div>
+            <p class="modal-warning" style="margin-top: 20px;">Ошибешься — предмет сгорает навсегда!</p>
         </div>
     </div>
 
-    <!-- ТВОИ ЗВУКИ ИЗ ПАПКИ -->
+    <!-- ТВОИ ЗВУКИ -->
     <audio id="localTickSound" src="tick.mp3" preload="auto"></audio>
     <audio id="localWinSound" src="win.mp3" preload="auto"></audio>
 

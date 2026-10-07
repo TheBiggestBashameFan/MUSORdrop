@@ -241,6 +241,15 @@ h1 {
 
 /* УБИРАЕМ ЦВЕТА ИЗ КРУТЯЩЕЙСЯ РУЛЕТКИ ДЛЯ ИНТРИГИ */
 /* Переписываем градиенты карточек внутри ТЕЙПА (рулетки), делая их одинаково темными */
+.card.white, .inventory-item.white, .target-item.white { 
+    border-bottom-color: #b0c4de; 
+    background: linear-gradient(to top, #2c3240, #242634); 
+}
+.card.lightblue, .inventory-item.lightblue, .target-item.lightblue { 
+    border-bottom-color: #5dade2; 
+    background: linear-gradient(to top, #1a3c4d, #242634); 
+}
+
 .card.blue, .inventory-item.blue, .target-item.blue { 
     border-bottom-color: #4b69ff; 
     background: linear-gradient(to top, #1a2247, #242634); 

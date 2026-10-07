@@ -89,34 +89,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Клик по карточке кейса в главном лобби
+    // Выбор кейса в главном лобби
     document.querySelectorAll('.case-card').forEach(card => {
         card.addEventListener('click', () => {
             const caseType = card.getAttribute('data-case-type');
             
-            // Защита: если файл JSON еще не успел прочитаться
+            // Жесткая проверка: если JSON файл еще не успел прочитаться сервером Гитхаба
             if (!casesData || !casesData[caseType] || casesData[caseType].length === 0) {
-                alert("Секунду, база данных задач подгружается! Попробуй еще раз.");
+                alert("Секунду, база данных задач подгружается сервером! Попробуй еще раз.");
                 return;
             }
 
             activeCasePool = casesData[caseType];
+            
             const caseNames = { firstPart: "ПЕРВАЯ ЧАСТЬ", geometry: "ГЕОМЕТРИЯ", secondPart: "ВТОРАЯ ЧАСТЬ" };
             currentCaseTitle.innerText = `КЕЙС: ${caseNames[caseType]}`;
-            
+
             mainMenu.classList.add('hidden');
             rouletteScreen.classList.remove('hidden');
             
+            // Принудительный сброс анимаций ленты
             isUpgradeGame = false;
             tape.style.transition = 'none';
             tape.style.transform = 'translateX(0px)';
             spinBtn.disabled = false;
             
-            createTape(); // Массив точно есть, карточки создадутся 100%
+            createTape(); // Теперь массив гарантированно есть, рулетка создастся без осечек
         });
     });
 
-    // Кнопка «Назад в меню»
+    // Кнопка Назад из экрана рулетки в главное лобби
     if (backToMenuBtn) {
         backToMenuBtn.addEventListener('click', () => {
             rouletteScreen.classList.add('hidden');
@@ -136,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (randomNum < activeCasePool[i].weight) return activeCasePool[i];
             randomNum -= activeCasePool[i].weight;
         }
-        return activeCasePool[0]; 
+        return activeCasePool; 
     }
 
     function createTape() {
@@ -147,10 +149,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             generatedCards.push(weightedTask);
             const card = document.createElement('div');
             card.className = `card ${weightedTask.color}`;
+            
+            // Настройка текста ярлыка редкости
+            let badgeText = 'КЕЙС';
+            if (weightedTask.color === 'red') badgeText = '💥 ТАЙНОЕ';
+            if (weightedTask.color === 'gold') badgeText = '👑 НОЖ';
+            if (weightedTask.color === 'white') badgeText = 'ШИРПОТРЕБ';
+            if (weightedTask.color === 'lightblue') badgeText = 'ПРОМЫШЛЕННОЕ';
+
             card.innerHTML = `
                 <span class="type-name">${weightedTask.type}</span>
                 <span class="math-preview" style="margin: 15px 0;">${weightedTask.short}</span>
-                <span class="type-name" style="font-size:0.6rem; color: #888;">${weightedTask.color === 'red' ? '💥 ТАЙНОЕ' : (weightedTask.color === 'gold' ? '👑 НОЖ' : 'КЕЙС')}</span>
+                <span class="type-name" style="font-size:0.6rem; color: #888;">${badgeText}</span>
             `;
             tape.appendChild(card);
         }
@@ -275,7 +285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             item.className = `inventory-item ${task.color}`;
             if (selectedInventoryIndex === idx) item.classList.add('selected');
             item.innerHTML = `
-                <span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span>
+                <span class="item-type">${task.type.split(' ') || ''}</span>
                 <span class="item-short">${task.short}</span>
                 <span style="font-size: 0.65rem; color: #aaa;">Ценность: ${task.value}</span>
             `;
@@ -292,7 +302,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     function renderUpgraderTargets() {
         upgraderTargetsList.innerHTML = '';
         
-        // Проверка: если JSON ещё не скачался к моменту переключения вкладки
         const allItems = [
             ...(casesData.firstPart || []),
             ...(casesData.geometry || []),
@@ -301,7 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         if (allItems.length === 0) return;
 
-        // СОРТИРОВКА: по возрастанию ранга редкости (от синей до золотой)
+        // СОРТИРОВКА: по возрастанию ранга редкости (от белого ранга 1 до золотого ранга 7)
         allItems.sort((a, b) => a.rank - b.rank);
         
         allItems.forEach(task => {
@@ -309,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             item.className = `target-item ${task.color}`;
             if (selectedTargetItem && selectedTargetItem.short === task.short) item.classList.add('selected');
             item.innerHTML = `
-                <span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span>
+                <span class="item-type">${task.type.split(' ') || ''}</span>
                 <span class="item-short">${task.short}</span>
                 <span style="font-size: 0.65rem; color: #ffb703;">Требует: ${task.value}</span>
             `;
@@ -397,7 +406,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }, 1200);
                 } else {
                     // ПРОИГРЫШ
-                    upgradeStatusText.innerText = "💥 УПС... Стрелка мимо, предмет сгорел!";
+                    upgradeStatusText.innerText = "💥 упс";
                     upgradeStatusText.style.color = "#ff4d4d";
                     
                     if (selectedInventoryIndex !== null) {

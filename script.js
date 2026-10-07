@@ -1,22 +1,7 @@
 let casesData = { firstPart: [], geometry: [], secondPart: [] };
 
-document.addEventListener("DOMContentLoaded", () => {
-    // ==========================================
-    // ЗАГРУЗКА ИЗ ВНЕШНЕГО JSON ФАЙЛА
-    // ==========================================
-    fetch('tasks.json')
-        .then(response => response.json())
-        .then(data => {
-            casesData = data;
-            console.log("База данных успешно загружена из JSON!");
-            // Принудительно отрисовываем цели в апгрейдере, как только данные прилетели
-            if (typeof renderUpgraderTargets === "function") {
-                renderUpgraderTargets();
-            }
-        })
-        .catch(err => {
-            console.error("Ошибка чтения JSON! Помни, на компе без Live Server будет CORS-ошибка, но на GitHub всё заработает само.", err);
-        });
+document.addEventListener("DOMContentLoaded", async () => {
+    // Находим все элементы интерфейса
     const mainMenu = document.getElementById('mainMenu');
     const rouletteScreen = document.getElementById('rouletteScreen');
     const upgraderScreen = document.getElementById('upgraderScreen');
@@ -43,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const upgradeActionBtn = document.getElementById('upgradeActionBtn');
     const upgradeStatusText = document.getElementById('upgradeStatusText');
 
+    // Системные переменные игры
     const tickPoolSize = 6;
     const tickPool = [];
     let currentPoolIndex = 0;
@@ -50,61 +36,34 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentWinnerTask = null; 
     let userInventory = [];
     let isUpgradeGame = false;
-
     let selectedInventoryItem = null;
     let selectedTargetItem = null;
+    let selectedInventoryIndex = null;
 
+    const CARD_WIDTH = 280; 
+    const TOTAL_CARDS = 60;  
+    let generatedCards = [];
+
+    // Создаем аудио-пул
     for (let i = 0; i < tickPoolSize; i++) {
         const audio = new Audio('tick.mp3');
         audio.preload = 'auto';
         tickPool.push(audio);
     }
 
-    const CARD_WIDTH = 280; 
-    const TOTAL_CARDS = 60;  
-    let generatedCards = [];
-
-    document.querySelectorAll('.case-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const caseType = card.getAttribute('data-case-type');
-            
-            // ПРОВЕРКА: Если JSON еще не успел скачаться с сервера, берем паузу
-            if (!casesData || !casesData[caseType] || casesData[caseType].length === 0) {
-                alert("Секунду, база данных задач еще подгружается сервером! Нажми через мгновение.");
-                return;
-            }
-
-            activeCasePool = casesData[caseType];
-            
-            const caseNames = { firstPart: "ПЕРВАЯ ЧАСТЬ", geometry: "ГЕОМЕТРИЯ", secondPart: "ВТОРАЯ ЧАСТЬ" };
-            currentCaseTitle.innerText = `КЕЙС: ${caseNames[caseType]}`;
-
-            mainMenu.classList.add('hidden');
-            rouletteScreen.classList.remove('hidden');
-            
-            // ПРИНУДИТЕЛЬНЫЙ СБРОС И ГЕНЕРАЦИЯ ЛЕНТЫ
-            isUpgradeGame = false;
-            tape.style.transition = 'none';
-            tape.style.transform = 'translateX(0px)';
-            spinBtn.disabled = false;
-            
-            createTape(); // Теперь лента гарантированно создастся из заполненного массива!
-        });
-    });
-
-    // Кнопка Назад из рулетки (Она у тебя уже была ниже)
-    if (backToMenuBtn) {
-        backToMenuBtn.addEventListener('click', () => {
-            rouletteScreen.classList.add('hidden');
-            mainMenu.classList.remove('hidden');
-            tape.style.transition = 'none';
-            tape.style.transform = 'translateX(0px)';
-            spinBtn.disabled = false;
-        });
+    // ЖЕСТКИЙ И СТАБИЛЬНЫЙ FETCH: ждем полной загрузки JSON перед тем, как включить кнопки
+    try {
+        const response = await fetch('tasks.json');
+        casesData = await response.json();
+        console.log("База данных успешно загружена из JSON!", casesData);
+    } catch (err) {
+        console.error("Критическая ошибка загрузки JSON! На компьютере используй Live Server.", err);
     }
-
-    // Переключение экранов в шапке
-    if(navMenuBtn && navUpgradeBtn) {
+// ==========================================
+// БЛОК 2: ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ И ВЫБОР КЕЙСОВ
+// ==========================================
+    // Переключение экранов (Кейсы / Апгрейдер)
+    if (navMenuBtn && navUpgradeBtn) {
         navMenuBtn.addEventListener('click', () => {
             navMenuBtn.classList.add('active');
             navUpgradeBtn.classList.remove('active');
@@ -124,7 +83,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Кнопка Назад из рулетки
+    // Клик по карточке кейса в главном лобби
+    document.querySelectorAll('.case-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const caseType = card.getAttribute('data-case-type');
+            
+            // Защита: если файл JSON еще не успел прочитаться
+            if (!casesData || !casesData[caseType] || casesData[caseType].length === 0) {
+                alert("Секунду, база данных задач подгружается! Попробуй еще раз.");
+                return;
+            }
+
+            activeCasePool = casesData[caseType];
+            const caseNames = { firstPart: "ПЕРВАЯ ЧАСТЬ", geometry: "ГЕОМЕТРИЯ", secondPart: "ВТОРАЯ ЧАСТЬ" };
+            currentCaseTitle.innerText = `КЕЙС: ${caseNames[caseType]}`;
+            
+            mainMenu.classList.add('hidden');
+            rouletteScreen.classList.remove('hidden');
+            
+            isUpgradeGame = false;
+            tape.style.transition = 'none';
+            tape.style.transform = 'translateX(0px)';
+            spinBtn.disabled = false;
+            
+            createTape(); // Массив точно есть, карточки создадутся 100%
+        });
+    });
+
+    // Кнопка «Назад в меню»
     if (backToMenuBtn) {
         backToMenuBtn.addEventListener('click', () => {
             rouletteScreen.classList.add('hidden');
@@ -137,19 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // БЛОК 3: ЛОГИКА РУЛЕТКИ КЕЙСОВ И ПРОВЕРКА ОТВЕТОВ
 // ==========================================
-    document.querySelectorAll('.case-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const caseType = card.getAttribute('data-case-type');
-            activeCasePool = casesData[caseType];
-            const caseNames = { firstPart: "ПЕРВАЯ ЧАСТЬ", geometry: "ГЕОМЕТРИЯ", secondPart: "ВТОРАЯ ЧАСТЬ" };
-            currentCaseTitle.innerText = `КЕЙС: ${caseNames[caseType]}`;
-            mainMenu.classList.add('hidden');
-            rouletteScreen.classList.remove('hidden');
-            isUpgradeGame = false;
-            createTape(); 
-        });
-    });
-
     function getRandomTaskByWeight() {
         const totalWeight = activeCasePool.reduce((sum, task) => sum + task.weight, 0);
         let randomNum = Math.random() * totalWeight;
@@ -171,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.innerHTML = `
                 <span class="type-name">${weightedTask.type}</span>
                 <span class="math-preview" style="margin: 15px 0;">${weightedTask.short}</span>
-                <span class="type-name" style="font-size:0.6rem; color: #888;">${weightedTask.color === 'red' ? '💥 ТАЙНОЕ' : ''}</span>
+                <span class="type-name" style="font-size:0.6rem; color: #888;">${weightedTask.color === 'red' ? '💥 ТАЙНОЕ' : (weightedTask.color === 'gold' ? '👑 НОЖ' : 'КЕЙС')}</span>
             `;
             tape.appendChild(card);
         }
@@ -244,27 +217,27 @@ document.addEventListener("DOMContentLoaded", () => {
         submitAnswerBtn.disabled = true;
 
         if (userTrimmedAnswer === currentWinnerTask.answer) {
-            answerResultStatus.innerText = "КРАСАВА!";
+            answerResultStatus.innerText = "🔥 КРАСАВА! ОТВЕТ ВЕРНЫЙ!";
             answerResultStatus.style.color = "#4b69ff";
             answerSection.style.display = "none";
             
-            if (isUpgradeGame) {
-                const index = userInventory.findIndex(item => item.id === selectedInventoryItem.id);
-                if (index !== -1) userInventory.splice(index, 1);
+            if (isUpgradeGame && selectedInventoryIndex !== null) {
+                userInventory.splice(selectedInventoryIndex, 1);
                 selectedInventoryItem = null;
+                selectedInventoryIndex = null;
             }
             
             userInventory.push(currentWinnerTask);
             updateInventoryUI();
         } else {
-            answerResultStatus.innerText = `❌ Правильный ответ: ${currentWinnerTask.answer}. Предмет сгорел.`;
+            answerResultStatus.innerText = `❌ МИМО! Правильный ответ: ${currentWinnerTask.answer}. Предмет сгорел.`;
             answerResultStatus.style.color = "#ff4d4d";
             answerSection.style.display = "none";
             
-            if (isUpgradeGame) {
-                const index = userInventory.findIndex(item => item.id === selectedInventoryItem.id);
-                if (index !== -1) userInventory.splice(index, 1);
+            if (isUpgradeGame && selectedInventoryIndex !== null) {
+                userInventory.splice(selectedInventoryIndex, 1);
                 selectedInventoryItem = null;
+                selectedInventoryIndex = null;
             }
             updateInventoryUI();
         }
@@ -278,16 +251,12 @@ document.addEventListener("DOMContentLoaded", () => {
         userInventory.forEach(task => {
             const itemElement = document.createElement('div');
             itemElement.className = `inventory-item ${task.color}`;
-            itemElement.innerHTML = `
-                <span class="item-type">${task.type.split(' ')[0]}</span>
-                <span class="item-short">${task.short}</span>
-                <span style="font-size: 0.65rem; color: #ffb703; font-weight:bold;">🏆 РЕШЕНО</span>
-            `;
+            itemElement.innerHTML = `<span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span><span class="item-short">${task.short}</span><span style="font-size: 0.65rem; color: #ffb703; font-weight:bold;">🏆 РЕШЕНО</span>`;
             inventoryGrid.appendChild(itemElement);
         });
     }
 // ==========================================
-// БЛОК 4: ЛОГИКА АПГРЕЙДЕРА И ХЕНДЛЕРЫ ЗАКРЫТИЯ
+// БЛОК 4: ИНТЕРФЕЙС АПГРЕЙДЕРА И ХЕНДЛЕРЫ ЗАКРЫТИЯ
 // ==========================================
     function renderUpgraderInventory() {
         upgraderInventoryList.innerHTML = '';
@@ -295,17 +264,18 @@ document.addEventListener("DOMContentLoaded", () => {
             upgraderInventoryList.innerHTML = '<p class="empty-text">Инвентарь пуст. Выбей вещи в кейсах!</p>';
             return;
         }
-        userInventory.forEach((task) => {
+        userInventory.forEach((task, idx) => {
             const item = document.createElement('div');
             item.className = `inventory-item ${task.color}`;
-            if (selectedInventoryItem && selectedInventoryItem.id === task.id) item.classList.add('selected');
+            if (selectedInventoryIndex === idx) item.classList.add('selected');
             item.innerHTML = `
-                <span class="item-type">${task.type.split(' ')}</span>
+                <span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span>
                 <span class="item-short">${task.short}</span>
                 <span style="font-size: 0.65rem; color: #aaa;">Ценность: ${task.value}</span>
             `;
             item.addEventListener('click', () => {
                 selectedInventoryItem = task;
+                selectedInventoryIndex = idx;
                 renderUpgraderInventory();
                 calculateUpgradeChance();
             });
@@ -313,28 +283,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    let selectedInventoryIndex = null; 
-
     function renderUpgraderTargets() {
         upgraderTargetsList.innerHTML = '';
         
-        // Собираем все шмотки вместе
-        const allItems = [...casesData.firstPart, ...casesData.geometry, ...casesData.secondPart];
+        // Проверка: если JSON ещё не скачался к моменту переключения вкладки
+        const allItems = [
+            ...(casesData.firstPart || []),
+            ...(casesData.geometry || []),
+            ...(casesData.secondPart || [])
+        ];
         
-        // СОРТИРОВКА: выстраиваем задачи по возрастанию ранга редкости (от синей до золотой)
+        if (allItems.length === 0) return;
+
+        // СОРТИРОВКА: по возрастанию ранга редкости (от синей до золотой)
         allItems.sort((a, b) => a.rank - b.rank);
         
         allItems.forEach(task => {
             const item = document.createElement('div');
             item.className = `target-item ${task.color}`;
-            
-            // ИСПРАВЛЕНИЕ: Сравниваем по короткому названию (short), так как оно уникально для каждой задачи
-            if (selectedTargetItem && selectedTargetItem.short === task.short) {
-                item.classList.add('selected');
-            }
-            
+            if (selectedTargetItem && selectedTargetItem.short === task.short) item.classList.add('selected');
             item.innerHTML = `
-                <span class="item-type">${task.type.split(' ')[0] || ''} ${task.type.split(' ')[1] || ''}</span>
+                <span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span>
                 <span class="item-short">${task.short}</span>
                 <span style="font-size: 0.65rem; color: #ffb703;">Требует: ${task.value}</span>
             `;
@@ -352,29 +321,28 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!selectedInventoryItem || !selectedTargetItem) {
             chancePercentDisplay.innerText = "0%";
             upgradeActionBtn.disabled = true;
-            if(ringFill) ringFill.style.strokeDashoffset = 515.2; // Сброс круга
+            if(ringFill) ringFill.style.strokeDashoffset = 515.2;
             return;
         }
 
         let chance = (selectedInventoryItem.value / selectedTargetItem.value) * 100;
         
-        // ХАК: Если шмотки одинаковой ценности или инвентарная дороже цели (из синей в синюю)
+        // НАЛОГ КАЗИНА: урезаем максимальный шанс до 75% при крафте одинаковых грейдов
         if (selectedInventoryItem.value >= selectedTargetItem.value) {
-            chance = 75; // Урезаем максимальный шанс до 75% ради азарта
+            chance = 75;
         }
 
         if (chance < 1) chance = 1;
         chancePercentDisplay.innerText = chance.toFixed(1) + "%";
         upgradeActionBtn.disabled = false;
 
-        // Расчет заполнения круга в SVG (длина контура 515.2)
         if(ringFill) {
             const offset = 515.2 - (515.2 * chance) / 100;
             ringFill.style.strokeDashoffset = offset;
         }
     }
 
-     if(upgradeActionBtn) {
+    if(upgradeActionBtn) {
         upgradeActionBtn.addEventListener('click', () => {
             if (!selectedInventoryItem || !selectedTargetItem) return;
             
@@ -403,11 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (finalAngle <= targetAngleLimit) {
                     // УСПЕХ!
-                    upgradeStatusText.innerText = "🎉Реши задачу, чтобы забрать её!";
+                    upgradeStatusText.innerText = "🎉 УСПЕХ! Реши задачу, чтобы забрать её!";
                     upgradeStatusText.style.color = "#4b69ff";
                     
                     setTimeout(() => {
-                        // СРАЗУ ОТКРЫВАЕМ МОДАЛКУ С ЗАДАЧЕЙ (Без лишних рулеток)
                         currentWinnerTask = selectedTargetItem;
                         isUpgradeGame = true;
                         
@@ -424,15 +391,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     }, 1200);
                 } else {
                     // ПРОИГРЫШ
-                    upgradeStatusText.innerText = "💥 УПС...";
+                    upgradeStatusText.innerText = "💥 УПС... Стрелка мимо, предмет сгорел!";
                     upgradeStatusText.style.color = "#ff4d4d";
                     
-                    const index = userInventory.findIndex(item => item.id === selectedInventoryItem.id);
-                    if (index !== -1) userInventory.splice(index, 1);
+                    if (selectedInventoryIndex !== null) {
+                        userInventory.splice(selectedInventoryIndex, 1);
+                    }
                     
                     selectedInventoryItem = null;
+                    selectedInventoryIndex = null;
+                    
                     renderUpgraderInventory();
                     calculateUpgradeChance();
+                    updateInventoryUI();
                     
                     setTimeout(() => {
                         radialPointer.style.transition = 'none';

@@ -176,6 +176,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         spinBtn.disabled = true;
         tape.style.transition = 'none';
         tape.style.transform = 'translateX(0px)';
+        userAnswerInput.value = "";
+        answerResultStatus.innerText = "";
+        answerSection.style.display = "flex";
+        submitAnswerBtn.disabled = false;
+        
+        // Скрываем кнопку выхода при новом спине
+        document.getElementById('modalCloseActionBtn').classList.add('hidden');
+
+        document.getElementById('manualAnswerDisplay').classList.add('hidden');
         
         // Сброс окон стандартной проверки
         userAnswerInput.value = "";
@@ -266,6 +275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             userInventory.push(currentWinnerTask);
             updateInventoryUI();
+            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
         } else {
             answerResultStatus.innerText = `❌ МИМО! Правильный ответ: ${currentWinnerTask.answer}. Предмет сгорел.`;
             answerResultStatus.style.color = "#ff4d4d";
@@ -277,6 +287,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 selectedInventoryIndex = null;
             }
             updateInventoryUI();
+
+            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
         }
     });
 
@@ -309,6 +321,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             userInventory.push(currentWinnerTask);
             updateInventoryUI();
+            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
+
         });
     }
 
@@ -326,6 +340,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 selectedInventoryIndex = null;
             }
             updateInventoryUI();
+            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
         });
     }
 
@@ -516,6 +531,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }, 1000);
                 }
             }, 3100);
+        });
+    }
+
+        // Твоя новая большая кнопка закрытия
+    const modalCloseActionBtn = document.getElementById('modalCloseActionBtn');
+    if(modalCloseActionBtn) {
+        modalCloseActionBtn.addEventListener('click', () => {
+            closeBtn.click(); // Просто имитируем клик по крестику, чтобы сработал готовый сброс рулетки
         });
     }
 

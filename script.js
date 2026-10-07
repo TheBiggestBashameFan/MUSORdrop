@@ -35,6 +35,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     let activeCasePool = [];
     let currentWinnerTask = null; 
     let userInventory = [];
+    try {
+        const savedInventory = localStorage.getItem('weierstrass_inventory');
+        if (savedInventory) {
+            userInventory = JSON.parse(savedInventory);
+            console.log(`Успешно восстановлено задач из памяти: ${userInventory.length}`);
+        }
+    } catch (e) {
+        console.error("Не удалось прочитать localStorage:", e);
+    }
+
+    // Первично отрисовываем инвентарь на главном экране сразу при загрузке
+    updateInventoryUI();
     let isUpgradeGame = false;
     let selectedInventoryItem = null;
     let selectedTargetItem = null;
@@ -355,6 +367,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             itemElement.innerHTML = `<span class="item-type">${task.type.split(' ')[0]} ${task.type.split(' ')[1] || ''}</span><span class="item-short">${task.short}</span><span style="font-size: 0.65rem; color: #ffb703; font-weight:bold;">🏆 РЕШЕНО</span>`;
             inventoryGrid.appendChild(itemElement);
         });
+        localStorage.setItem('weierstrass_inventory', JSON.stringify(userInventory));
     }
 // ==========================================
 // БЛОК 4: ИНТЕРФЕЙС АПГРЕЙДЕРА И ХЕНДЛЕРЫ ЗАКРЫТИЯ
@@ -547,4 +560,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             createTape();
         }
     });
+
+    const resetProgressBtn = document.getElementById('resetProgressBtn');
+    if (resetProgressBtn) {
+        resetProgressBtn.addEventListener('click', () => {
+            if (confirm("Ты точно хочешь удалить ВСЕ решенные задачи из инвентаря? Это действие необратимо!")) {
+                userInventory = [];
+                localStorage.removeItem('weierstrass_inventory');
+                updateInventoryUI();
+                alert("Прогресс полностью обнулен. Пора ботать заново!");
+            }
+        });
+    }
 });

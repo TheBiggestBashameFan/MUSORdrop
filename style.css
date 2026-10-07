@@ -391,3 +391,63 @@ h1 {
 .close-btn:hover { color: #fff; }
 .modal-task { background: #242634; padding: 20px; border-radius: 6px; margin: 20px 0; font-size: 1.15rem; line-height: 1.6; border-left: 5px solid #ffb703; text-align: left; }
 .modal-warning { color: #ff4d4d; font-weight: bold; font-size: 0.85rem; }
+
+.manual-check-section {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.show-manual-btn {
+    background: #ffb703;
+    color: #12131a;
+    border: none;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+.show-manual-btn:hover { background: #fb8500; color: #fff; }
+
+.manual-answer-display {
+    background: #12131a;
+    border: 1px dashed #ffb703;
+    padding: 15px;
+    border-radius: 6px;
+    width: 100%;
+    text-align: left;
+    font-size: 1.05rem;
+    color: #fff;
+    line-height: 1.5;
+}
+
+.honesty-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.honesty-btn {
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.2s;
+    flex: 1;
+    max-width: 220px;
+}
+
+.honesty-btn.win { background: #4b69ff; box-shadow: 0 4px 10px rgba(75, 105, 255, 0.3); }
+.honesty-btn.win:hover { background: #3b55df; }
+
+.honesty-btn.lose { background: #ff4d4d; box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3); }
+.honesty-btn.lose:hover { background: #e03333; }

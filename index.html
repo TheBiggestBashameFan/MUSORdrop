@@ -104,15 +104,26 @@
     <!-- Модалка выигрыша / проверки ответа -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <span class="close-btn" id="closeBtn">&times;</span>
-            <h2 id="modalTitle">Выпало задание!</h2>
             <div class="modal-task" id="modalTask"></div>
+            
+            <!-- ВАРИАНТ А: Стандартный инпут для 1 части и геометрии -->
             <div class="answer-section" id="answerSection">
                 <input type="text" id="userAnswerInput" placeholder="Введите ваш ответ (число)..." autocomplete="off">
                 <button id="submitAnswerBtn">ПРОВЕРИТЬ ОТВЕТ</button>
             </div>
+
+            <!-- ВАРИАНТ Б: Твой новый блок самопроверки для параметров и 2 части -->
+            <div class="manual-check-section hidden" id="manualCheckSection">
+                <button class="show-manual-btn" id="showManualAnswerBtn">👁️ ПОКАЗАТЬ ПРАВИЛЬНЫЙ ОТВЕТ</button>
+                <div class="manual-answer-display hidden" id="manualAnswerDisplay"></div>
+                <div class="honesty-buttons hidden" id="honestyButtons">
+                    <button class="honesty-btn win" id="honestyWinBtn">✅ ДА, Я РЕШИЛ ПРАВИЛЬНО</button>
+                    <button class="honesty-btn lose" id="honestyLoseBtn">❌ НЕТ, Я СЛИЛ / ОШИБСЯ</button>
+                </div>
+            </div>
+            
             <div id="answerResultStatus" style="font-weight: bold; margin-top: 15px; font-size: 1.1rem;"></div>
-            <p class="modal-warning" style="margin-top: 20px;">Ошибешься — предмет сгорает навсегда!</p>
+            <p class="modal-warning" style="margin-top: 20px;">Играем на честность. Ошибешься — предмет сгорает навсегда!</p>
         </div>
     </div>
 

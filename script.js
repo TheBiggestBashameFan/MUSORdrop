@@ -176,10 +176,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         spinBtn.disabled = true;
         tape.style.transition = 'none';
         tape.style.transform = 'translateX(0px)';
+        
+        // Сброс окон стандартной проверки
         userAnswerInput.value = "";
         answerResultStatus.innerText = "";
-        answerSection.style.display = "flex";
         submitAnswerBtn.disabled = false;
+        
+        // СБРОС ОКОН САМОПРОВЕРКИ ДЛЯ 2 ЧАСТИ
+        document.getElementById('manualAnswerDisplay').classList.add('hidden');
+        document.getElementById('honestyButtons').classList.add('hidden');
+        document.getElementById('showManualAnswerBtn').classList.remove('hidden');
 
         playPooledTick();
         setTimeout(playPooledTick, 15);
@@ -219,6 +225,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 isSpinning = false; 
                 if(winSound) { winSound.currentTime = 0; winSound.play().catch(()=>{}); }
                 modalTask.innerHTML = currentWinnerTask.full;
+                
+                // ЛОГИКА ОПРЕДЕЛЕНИЯ ТИПА ПРОВЕРКИ
+                const manualSection = document.getElementById('manualCheckSection');
+                if (currentWinnerTask.answer === "manual") {
+                    // Режим самопроверки для сложных параметров
+                    answerSection.style.display = "none";
+                    manualSection.classList.remove('hidden');
+                    // Зашиваем текстовый развернутый ответ в скрытый блок
+                    document.getElementById('manualAnswerDisplay').innerHTML = `<b>Правильный ответ:</b><br><br>${currentWinnerTask.manualAnswer || 'Ответ не указан в базе.'}`;
+                } else {
+                    // Обычный числовой режим для 1 части
+                    answerSection.style.display = "flex";
+                    manualSection.classList.add('hidden');
+                }
+
                 modal.style.display = 'flex';
             }, 5600);
         }, 50);
@@ -258,6 +279,55 @@ document.addEventListener("DOMContentLoaded", async () => {
             updateInventoryUI();
         }
     });
+
+    const showManualAnswerBtn = document.getElementById('showManualAnswerBtn');
+    const manualAnswerDisplay = document.getElementById('manualAnswerDisplay');
+    const honestyButtons = document.getElementById('honestyButtons');
+
+    if(showManualAnswerBtn) {
+        showManualAnswerBtn.addEventListener('click', () => {
+            showManualAnswerBtn.classList.add('hidden');
+            manualAnswerDisplay.classList.remove('hidden');
+            honestyButtons.classList.remove('hidden');
+        });
+    }
+
+    // КНОПКА ЧЕСТНОСТИ: Да, я решил правильно (+1 в инвентарь)
+    const honestyWinBtn = document.getElementById('honestyWinBtn');
+    if(honestyWinBtn) {
+        honestyWinBtn.addEventListener('click', () => {
+            answerResultStatus.innerText = "🔥 ХОРОШО СРАБОТАНО! Задача зачислена в инвентарь.";
+            answerResultStatus.style.color = "#4b69ff";
+            document.getElementById('manualCheckSection').classList.add('hidden');
+            
+            // Если играли из апгрейдера — удаляем старый расходник
+            if (isUpgradeGame && selectedInventoryIndex !== null) {
+                userInventory.splice(selectedInventoryIndex, 1);
+                selectedInventoryItem = null;
+                selectedInventoryIndex = null;
+            }
+            
+            userInventory.push(currentWinnerTask);
+            updateInventoryUI();
+        });
+    }
+
+    // КНОПКА ЧЕСТНОСТИ: Нет, я ошибся (Сгорает)
+    const honestyLoseBtn = document.getElementById('honestyLoseBtn');
+    if(honestyLoseBtn) {
+        honestyLoseBtn.addEventListener('click', () => {
+            answerResultStatus.innerText = "💥 Увы! Предмет сгорает. Попробуй прокачаться заново!";
+            answerResultStatus.style.color = "#ff4d4d";
+            document.getElementById('manualCheckSection').classList.add('hidden');
+            
+            if (isUpgradeGame && selectedInventoryIndex !== null) {
+                userInventory.splice(selectedInventoryIndex, 1);
+                selectedInventoryItem = null;
+                selectedInventoryIndex = null;
+            }
+            updateInventoryUI();
+        });
+    }
 
     function updateInventoryUI() {
         if (userInventory.length > 0 && emptyText) emptyText.style.display = "none";
@@ -385,7 +455,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const targetAngleLimit = (chance / 100) * 360;
                 
                 if (finalAngle <= targetAngleLimit) {
-                    // УСПЕХ!
+                    // ==========================================
+                    // УСПЕХ АПГРЕЙДА!
+                    // ==========================================
                     upgradeStatusText.innerText = "🎉 УСПЕХ! Реши задачу, чтобы забрать её!";
                     upgradeStatusText.style.color = "#4b69ff";
                     
@@ -395,10 +467,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                         
                         userAnswerInput.value = "";
                         answerResultStatus.innerText = "";
-                        answerSection.style.display = "flex";
                         submitAnswerBtn.disabled = false;
 
                         modalTask.innerHTML = currentWinnerTask.full;
+                        
+                        // ХАК ДЛЯ АПГРЕЙДЕРА: Автоматически переключаем режим проверки в модалке
+                        const manualSection = document.getElementById('manualCheckSection');
+                        if (currentWinnerTask.answer === "manual") {
+                            // Если скрафтили параметр — включаем селф-чек
+                            answerSection.style.display = "none";
+                            manualSection.classList.remove('hidden');
+                            document.getElementById('manualAnswerDisplay').innerHTML = `<b>Правильный ответ:</b><br><br>${currentWinnerTask.manualAnswer || 'Ответ не указан.'}`;
+                        } else {
+                            // Если скрафтили задачу из 1 части — оставляем инпут
+                            answerSection.style.display = "flex";
+                            manualSection.classList.add('hidden');
+                        }
+
+                        // Сброс кнопок отображения ответа
+                        document.getElementById('manualAnswerDisplay').classList.add('hidden');
+                        document.getElementById('honestyButtons').classList.add('hidden');
+                        document.getElementById('showManualAnswerBtn').classList.remove('hidden');
+
                         modal.style.display = 'flex';
                         
                         radialPointer.style.transition = 'none';

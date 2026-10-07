@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitAnswerBtn.disabled = false;
         
         // Скрываем кнопку выхода при новом спине
-        document.getElementById('modalCloseActionBtn').classList.add('hidden');
+        
 
         document.getElementById('manualAnswerDisplay').classList.add('hidden');
         
@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             userInventory.push(currentWinnerTask);
             updateInventoryUI();
-            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
+            
         } else {
             answerResultStatus.innerText = `❌ МИМО! Правильный ответ: ${currentWinnerTask.answer}. Предмет сгорел.`;
             answerResultStatus.style.color = "#ff4d4d";
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             updateInventoryUI();
 
-            document.getElementById('modalCloseActionBtn').classList.remove('hidden');
+            
         }
     });
 
@@ -535,12 +535,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
         // Твоя новая большая кнопка закрытия
-    const modalCloseActionBtn = document.getElementById('modalCloseActionBtn');
-    if(modalCloseActionBtn) {
-        modalCloseActionBtn.addEventListener('click', () => {
-            closeBtn.click(); // Просто имитируем клик по крестику, чтобы сработал готовый сброс рулетки
-        });
-    }
+    
+    
 
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';

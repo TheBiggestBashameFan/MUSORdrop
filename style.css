@@ -387,8 +387,24 @@ h1 {
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
 .modal-content { background: #1c1d27; border: 2px solid #ffb703; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; position: relative; box-shadow: 0 0 30px rgba(255, 183, 3, 0.3); }
-.close-btn { position: absolute; right: 20px; top: 15px; font-size: 1.8rem; cursor: pointer; color: #aaa; }
-.close-btn:hover { color: #fff; }
+.close-btn {
+    position: absolute;
+    right: 20px; 
+    top: 15px;
+    font-size: 2rem; /* Сделали чуть побольше */
+    cursor: pointer;
+    color: #fff !important; /* Чистый белый цвет, теперь его видно идеально! */
+    font-weight: bold;
+    opacity: 0.7;
+    transition: 0.2s;
+    z-index: 10;
+}
+
+.close-btn:hover { 
+    opacity: 1;
+    transform: scale(1.1);
+    text-shadow: 0 0 10px #ffb703; /* Золотое свечение при наведении */
+}
 .modal-task { background: #242634; padding: 20px; border-radius: 6px; margin: 20px 0; font-size: 1.15rem; line-height: 1.6; border-left: 5px solid #ffb703; text-align: left; }
 .modal-warning { color: #ff4d4d; font-weight: bold; font-size: 0.85rem; }
 

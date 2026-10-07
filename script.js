@@ -52,12 +52,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ЖЕСТКИЙ И СТАБИЛЬНЫЙ FETCH: ждем полной загрузки JSON перед тем, как включить кнопки
-    try {
-        const response = await fetch('tasks.json');
+       try {
+        // Хак: берем текущий путь к сайту и склеиваем его с именем файла
+        const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const jsonUrl = window.location.origin + currentPath + 'tasks.json';
+        
+        console.log("Пытаюсь скачать базу отсюда:", jsonUrl);
+        
+        const response = await fetch(jsonUrl);
         casesData = await response.json();
         console.log("База данных успешно загружена из JSON!", casesData);
     } catch (err) {
-        console.error("Критическая ошибка загрузки JSON! На компьютере используй Live Server.", err);
+        console.error("Критическая ошибка загрузки JSON!", err);
     }
 // ==========================================
 // БЛОК 2: ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ И ВЫБОР КЕЙСОВ
